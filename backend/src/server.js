@@ -1,22 +1,26 @@
-const net = require('net');
+const { Server } = require('net')
 
-const host = '127.0.0.1';
-const port = 1234;
+const server = new Server()
+const port = 8000
+const host = '0.0.0.0'
 
+const END = 'END'
 
-const server = net.createServer((socket) => {
-    console.log('Cliente conectado:', socket.remoteAddress);
-
-    // Maneja datos recibidos
+server.on('connection', (socket) => {    
+    console.log(`Cliente conectado: ${socket.remoteAddress}:${socket.remotePort}`);
+    socket.setEncoding('utf-8')
+    
     socket.on('data', (data) => {
-        console.log('Mensaje recibido:', data.toString());        
-        socket.write(`Servidor: Recibido "${data}"`);
-    });
+      if (data === END) {
+        socket.end()
+        return
+      }
 
-    // Maneja la desconexión
-    socket.on('end', () => console.log('Cliente desconectado.'));
-});
+      
+      console.log(`Mensaje recibido: ${data}`);  
+    })
+})
 
 server.listen(port, host, () => {
-    console.log('Servidor TCP escuchando en el puerto 1234');
-});
+    console.log(`Servidor TCP escuchando en el puerto ${port}`);
+})
