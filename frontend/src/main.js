@@ -1,41 +1,51 @@
-const { app, BrowserWindow } = require('electron')
-
+const { app, BrowserWindow, ipcMain } = require('electron');
 const { Socket } = require('net')
-const socket = new Socket()
+const path = require('path');
 
 const createWindow = () => {
     const mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
-            nodeIntegration: true
+            nodeIntegration: false,
+            contextIsolation: true,
+            preload: path.join(__dirname, 'js/preload.js'),
         }
     })
 
-    mainWindow.loadFile('./src/index.html')
+    mainWindow.loadFile(path.join(__dirname, 'index.html'))
 }
 
 app.whenReady().then(() => {
     createWindow()
+    const socket = new Socket()
+    const END = 'END'
+
     socket.connect({
         host: 'localhost',
         port: 8000
-    })    
-    socket.write('hola')
-})
+    })  
 
-/*
-const useSocket = () => {
+    // Manejar mensajes desde el servidor y reenviarlos al renderer
     socket.on('data', (data) => {
-        if (data === END) {
+        const mainWindow = BrowserWindow.getAllWindows()[0]; // Obtener la ventana principal
+        if (mainWindow) {
+            mainWindow.webContents.send('receive-message', data.toString()); // Reenviar mensaje
+        }
+    });
+
+    // Manejar mensajes desde el frontend
+    ipcMain.on('message-to-server', (_, message) => {
+        if (message === END) {
             socket.end()
-            process.exit(0)             
+            process.exit()
         }
 
-        console.log(`Mensaje recibido: ${data}`);
-    })
-}
-*/
-module.exports = {
-    socket
-}
+        if (socket) {
+            socket.write(message);
+        }
+
+    });
+
+    socket.on('error', (err) => console.error('Socket error:', err));
+})

@@ -1,23 +1,30 @@
+const form = document.getElementById('myForm');
+const listMessages = document.getElementById('listMessages');
 
-const { socket } = require('../main.js')
+// Enviar mensajes al servidor
+const handleSubmit = (e) => {
+    e.preventDefault();
+    const message = e.target.message.value;
 
-const listMessages = document.getElementById('list_messages')
-const formChat = document.getElementById('form_chat')
+    if (message) {
+        window.electron.sendMessage(message); // Usar la función del preload
+        addMessageToList(`Tú: ${message}`);
+    }
 
-formChat.addEventListener('submit', handleSubmit)
+    e.target.message.value = '';
+};
 
-const handleSubmit = (e) => {    
-    e.preventDefault()
+// Mostrar mensajes en la lista
+const addMessageToList = (message) => {
+    const li = document.createElement('li');
+    li.textContent = message;
+    listMessages.appendChild(li);
+};
 
-    console.log('Form submit')
-    const message = e.target.message.value
+// Escuchar mensajes del servidor
+window.electron.onMessage((message) => {
+    addMessageToList(`Servidor: ${message}`);
+});
 
-    if (!message) return
-
-    socket.write(message)
-    e.target.reset()
-}
-
-socket.on('data', (data) => {
-    listMessages.innerHTML += `<li>${data}</li>`
-})
+// Manejar el evento del formulario
+form.addEventListener('submit', handleSubmit);

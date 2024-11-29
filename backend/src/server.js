@@ -8,16 +8,19 @@ const END = 'END'
 
 server.on('connection', (socket) => {    
     console.log(`Cliente conectado: ${socket.remoteAddress}:${socket.remotePort}`);
+    const {remotePort} = socket
     socket.setEncoding('utf-8')
     
-    socket.on('data', (data) => {
-      if (data === END) {
+    socket.on('data', (message) => {
+      if (message === END) {
+        console.log(`Conexion ${remotePort} finalizada`)
         socket.end()
         return
       }
 
       
-      console.log(`Mensaje recibido: ${data}`);  
+      console.log(`Mensaje recibido: ${message}`);
+      socket.write(`${remotePort} --> ${data}`)
     })
 })
 

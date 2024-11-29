@@ -7,6 +7,8 @@
     <title>Document</title>
     <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self';">
+
     <link rel="stylesheet" href="styles/styles.css">
     <title>Hello World!</title>
 </head>
@@ -28,12 +30,13 @@
             <div class="cont--chat">
                 <section class="cont--messages">
                     <h3 class="messages--title">Mi chat</h3>
-                    <ul class="cont--text" id="list_messages">
+                    <ul class="cont--text" id="listMessages">
                     </ul>
                 </section>
 
-                <form id="form_chat"  class="form">
-                    <input class="form--text" type="text" name="message" required placeholder="Escribe un mensaje" />                    
+                <form id="myForm" class="form">
+                    <input id="message" class="form--text" type="text" name="message" required
+                        placeholder="Escribe un mensaje" />
                     <input class="form--button" type="submit" value="Enviar">
                 </form>
             </div>
@@ -48,8 +51,8 @@
             </div>
         </footer>
     </div>
-
-    <script src="./js/chat.js"></script>
+    <script src="js/chat.js"></script>
+    
 </body>
 
 </html>
