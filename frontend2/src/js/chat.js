@@ -1,5 +1,7 @@
 const form = document.getElementById('myForm');
 const listMessages = document.getElementById('listMessages');
+const classOther = 'other-message';
+const classMy = 'my-message';
 
 // Enviar mensajes al servidor
 const handleSubmit = (e) => {
@@ -8,31 +10,23 @@ const handleSubmit = (e) => {
 
     if (message) {
         window.electron.sendMessage(message);
-        addMyMessageToList(`Tú: ${message}`);
+        addMessageToList(`Tú: ${message}`, classMy);
     }
 
     e.target.message.value = '';
 };
 
 // Mostrar mensajes en la lista
-const addMessageToList = (message) => {
+const addMessageToList = (message, classStyle) => {
     const li = document.createElement('li');
-    li.classList.add('other-message');
+    li.classList.add(classStyle);
     li.textContent = message;
     listMessages.appendChild(li);
 };
 
-const addMyMessageToList = (message) => {
-    const li = document.createElement('li');
-    li.classList.add('my-message');
-    li.textContent = message;
-    listMessages.appendChild(li);
-}
-
-
 // Escuchar mensajes del servidor
 window.electron.onMessage((message) => {
-    addMessageToList(`${message}`);
+    addMessageToList(`${message}`, classOther);
 });
 
 // Manejar el evento del formulario
