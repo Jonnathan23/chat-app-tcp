@@ -18,7 +18,7 @@ const connections = new Map()
 /**
  * @description Encriptar un mensaje
  * @param {*} text 
- * @returns 
+ * @returns void
  */
 const encrypt = (text) => {
     const iv = crypto.randomBytes(16); // Vector de inicialización
@@ -31,7 +31,7 @@ const encrypt = (text) => {
 /**
  * @description Desencriptar un mensaje
  * @param {*} encryptedText 
- * @returns 
+ * @returns void
  */
 const decrypt = (encryptedText) => {
     const [iv, content] = encryptedText.split(':');
@@ -56,8 +56,9 @@ const sendMessage = (message, origin) => {
 }
 
 
-//* Manejar la conexión de los clientes
-
+/**
+ * @description Manejar la conexión de los clientes
+ */
 server.on('connection', (socket) => {
     console.log(`Cliente conectado: ${socket.remoteAddress}:${socket.remotePort}`);
     const { remotePort } = socket

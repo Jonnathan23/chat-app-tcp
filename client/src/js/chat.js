@@ -3,7 +3,10 @@ const listMessages = document.getElementById('listMessages');
 const classOther = 'other-message';
 const classMy = 'my-message';
 
-// Enviar mensajes al servidor
+/**
+ * @description Enviar mensajes al servidor
+ * @param {*} e 
+ */
 const handleSubmit = (e) => {
     e.preventDefault();
     const message = e.target.message.value;
@@ -18,8 +21,8 @@ const handleSubmit = (e) => {
 
 /**
  * @description Añade mensajes a la lista
- * @param {*} message 
- * @param {*} classStyle 
+ * @param {string} message - mensaje del usuario o del servidor
+ * @param {string} classStyle - nombre de la clase para el estilo css
  */
 const addMessageToList = (message, classStyle) => {
     const li = document.createElement('li');
@@ -28,7 +31,10 @@ const addMessageToList = (message, classStyle) => {
     listMessages.appendChild(li);
 };
 
-// Escuchar mensajes del servidor
+
+/**
+ * @description Recibe mensajes del servidor
+ */
 window.electron.onMessage((message) => {
     addMessageToList(`${message}`, classOther);
 });
