@@ -16,7 +16,11 @@ const handleSubmit = (e) => {
     e.target.message.value = '';
 };
 
-// Mostrar mensajes en la lista
+/**
+ * @description Añade mensajes a la lista
+ * @param {*} message 
+ * @param {*} classStyle 
+ */
 const addMessageToList = (message, classStyle) => {
     const li = document.createElement('li');
     li.classList.add(classStyle);
