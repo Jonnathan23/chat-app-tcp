@@ -5,7 +5,7 @@ const handleSubmit = (e) => {
     const username = e.target.username.value;
 
     if (username) {
-        window.electron.sendMessage(username);        
+        window.electron.setUsername(username);        
         window.location.href = 'chat.html';
     }    
 };
