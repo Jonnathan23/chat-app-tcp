@@ -21,40 +21,23 @@ server.on('connection', (socket) => {
   const { remotePort } = socket
   socket.setEncoding('utf-8')
 
-  connections.set(socket)
-
   socket.on('data', (message) => {
-    /*
-      if (!connections.has(socket)) {
-        connections.set(socket, message)
-        socket.write(`Bienvenido ${message}`)
-        return
-      }
-  
-      if (message === END) {
-        socket.end()
-        return
-      }
-      /*
-          for (const username of connections.values()) {
-            console.log(username)
-          }
-    
 
-    const fullMessage = `${connections.get(socket)}:${message}`
-    socket.write(message)
-    //sendMessage(message, socket)
-    */
+    if (!connections.has(socket)) {
+      console.log(`Username: ${message} set for ${remotePort}`)
+      connections.set(socket, message)
 
-    if (message === END) {
+    } else if (message === END) {
       console.log(`Conexion ${remotePort} finalizada`)
       socket.end()
-      return
+
+    } else {
+      console.log(`Mensaje recibido: ${message}`);
+      socket.write(`${remotePort} --> ${message}`)
+
     }
 
 
-    console.log(`Mensaje recibido: ${message}`);
-    socket.write(`${remotePort} --> ${message}`)
 
 
   })
