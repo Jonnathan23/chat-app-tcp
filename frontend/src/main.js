@@ -1,41 +1,25 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const { Socket } = require('net')
 const path = require('path');
-const crypto = require('crypto');
+const {encrypt, decrypt} = require('./js/encryptation.js');
 
-
-// Clave secreta y algoritmo de encriptación (debe coincidir con el servidor)
-const SECRET_KEY = '12345678901234567890123456789012'; // 32 caracteres
-const ALGORITHM = 'aes-256-ctr';
 let username = ''
 let socket
-const END = 'END'
 
 /**
- * @description Encriptar un mensaje
- * @param {*} text 
- * @returns 
+ * @description Contenedor de errores del socket
  */
-const encrypt = (text) => {
-    const iv = crypto.randomBytes(16); // Vector de inicialización
-    const cipher = crypto.createCipheriv(ALGORITHM, SECRET_KEY, iv);
-    const encrypted = Buffer.concat([cipher.update(text, 'utf-8'), cipher.final()]);
-    return `${iv.toString('hex')}:${encrypted.toString('hex')}`;
-};
+const SocketErrors = {
+    ECONNREFUSED: () => console.log('El servidor está inaccesible. Reintentando conexión...'),
+    ECONNRESET: () => console.log('El servidor cerró la conexión inesperadamente. Reintentando...'),
+    ETIMEDOUT: () => console.log('La conexión al servidor tardó demasiado. Reintentando...')
+}
+const SocketErrorDefualt = () => console.log('Error inesperado del socket')
 
 
 /**
- * @description Desencriptar un mensaje
- * @param {*} encryptedText 
- * @returns 
+ * @description Conectar al servidor
  */
-const decrypt = (encryptedText) => {
-    const [iv, content] = encryptedText.split(':');
-    const decipher = crypto.createDecipheriv(ALGORITHM, SECRET_KEY, Buffer.from(iv, 'hex'));
-    const decrypted = Buffer.concat([decipher.update(Buffer.from(content, 'hex')), decipher.final()]);
-    return decrypted.toString('utf-8');
-};
-
 const connectToServer = () => {
     try {
         socket = new Socket();
@@ -48,9 +32,20 @@ const connectToServer = () => {
             }
         });
 
+        // Evento 'ready' indica que el socket está completamente inicializado
+        socket.on('ready', () => console.log('Socket listo para enviar y recibir datos.'));
+
+        // Evento 'end' indica que el servidor cerró la conexión de forma ordenada
+        socket.on('end', () => console.log('Servidor solicitó cierre de conexión.'));
+
+        // Evento 'timeout' indica que el socket no ha recibido actividad en un tiempo determinado
+        socket.on('timeout', () => console.warn('El socket ha entrado en tiempo de espera (timeout).'));
+
+        // Evento data, Recibe un mensaje del servidor
         socket.on('data', (data) => {
             const decryptedMessage = decrypt(data.toString());
             console.log('Mensaje del servidor:', decryptedMessage);
+
             const mainWindow = BrowserWindow.getAllWindows()[0];
             if (mainWindow) {
                 mainWindow.webContents.send('receive-message', decryptedMessage);
@@ -58,20 +53,23 @@ const connectToServer = () => {
         });
 
         socket.on('error', (err) => {
-            console.error('Error del socket:', err.message);
+            console.error(` ----| | Error del socket | |---- `);
+            const error = SocketErrors[err.code] || SocketErrorDefualt
+            error()
         });
 
         socket.on('close', () => {
             console.log('Conexión cerrada.');
-            let cont = 0
             setTimeout(() => {
-                cont++
                 console.log('Intentando reconectar...')
-                cont <= 5 ? connectToServer(): console.log('No se pudo reconectar')
-            }, 3000); // Intentar reconectar después de 3 segundos
+                connectToServer()
+            }, 3000);
         });
 
+
+
     } catch (error) {
+        console.log('Error al conectar al servidor')
         console.log(error)
     }
 };
@@ -98,7 +96,6 @@ const createWindow = () => {
 
 app.whenReady().then(() => {
     createWindow()
-
     connectToServer();
 
     ipcMain.on('send-message', (_, message) => {
