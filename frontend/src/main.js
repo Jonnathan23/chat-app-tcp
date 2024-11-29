@@ -7,7 +7,9 @@ const crypto = require('crypto');
 // Clave secreta y algoritmo de encriptación (debe coincidir con el servidor)
 const SECRET_KEY = '12345678901234567890123456789012'; // 32 caracteres
 const ALGORITHM = 'aes-256-ctr';
-
+let username = ''
+let socket
+const END = 'END'
 
 /**
  * @description Encriptar un mensaje
@@ -34,6 +36,46 @@ const decrypt = (encryptedText) => {
     return decrypted.toString('utf-8');
 };
 
+const connectToServer = () => {
+    try {
+        socket = new Socket();
+        socket.connect({ host: 'localhost', port: 8000 }, () => {
+            console.log('Conectado al servidor');
+            if (username) {
+                // Reenviar el nombre de usuario al reconectar
+                const encryptedUsername = encrypt(username);
+                socket.write(encryptedUsername);
+            }
+        });
+
+        socket.on('data', (data) => {
+            const decryptedMessage = decrypt(data.toString());
+            console.log('Mensaje del servidor:', decryptedMessage);
+            const mainWindow = BrowserWindow.getAllWindows()[0];
+            if (mainWindow) {
+                mainWindow.webContents.send('receive-message', decryptedMessage);
+            }
+        });
+
+        socket.on('error', (err) => {
+            console.error('Error del socket:', err.message);
+        });
+
+        socket.on('close', () => {
+            console.log('Conexión cerrada.');
+            let cont = 0
+            setTimeout(() => {
+                cont++
+                console.log('Intentando reconectar...')
+                cont <= 5 ? connectToServer(): console.log('No se pudo reconectar')
+            }, 3000); // Intentar reconectar después de 3 segundos
+        });
+
+    } catch (error) {
+        console.log(error)
+    }
+};
+
 
 /**
  * @description Crea una ventana principal de Electron con las opciones predefinidas y
@@ -56,29 +98,22 @@ const createWindow = () => {
 
 app.whenReady().then(() => {
     createWindow()
-    const socket = new Socket()
-    const END = 'END'
 
-    socket.connect({ host: 'localhost', port: 8000 }, () =>  console.log('Conectado al servidor'));
-
-    // Manejar mensajes recibidos desde el servidor
-    socket.on('data', (data) => {
-        const decryptedMessage = decrypt(data.toString());
-        const mainWindow = BrowserWindow.getAllWindows()[0];
-
-        if (mainWindow) {
-            mainWindow.webContents.send('receive-message', decryptedMessage.toString());
-        }
-    });
+    connectToServer();
 
     ipcMain.on('send-message', (_, message) => {
-        const encryptedMessage = encrypt(message);
-        socket.write(encryptedMessage);
+        if (socket && !socket.destroyed) {
+            const encryptedMessage = encrypt(message);
+            socket.write(encryptedMessage);
+        } else {
+            console.error('Socket no está conectado o está destruido');
+        }
 
     });
 
-    // Manejar errores de conexión
-    socket.on('error', (err) => console.error('Socket error:', err));
-
-    socket.on('close', () => process.exit(0))   
+    ipcMain.on('set-username', (_, user) => {
+        username = user; // Guardar el nombre de usuario
+        const encryptedUsername = encrypt(user);
+        socket.write(encryptedUsername);
+    });
 })

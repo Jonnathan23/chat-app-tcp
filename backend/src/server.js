@@ -77,7 +77,11 @@ server.on('connection', (socket) => {
             console.log(`Conexion ${remotePort} finalizada`)
             socket.end()
 
-        } else {                   
+        } else {       
+            console.log('Users actcual')            
+            for(const username of connections.values()){
+                console.log(username)
+            }
             const decryptedMessage = decrypt(message);
             const fullMessage = `${connections.get(socket)}: ${decryptedMessage}`
             sendMessage(fullMessage, socket)
@@ -86,6 +90,7 @@ server.on('connection', (socket) => {
 
     socket.on('close', () => {
         console.log(`Conexion ${remotePort} finalizada`)
+        connections.delete(socket)
     })
 })
 
