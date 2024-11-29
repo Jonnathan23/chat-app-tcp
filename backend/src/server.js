@@ -49,7 +49,7 @@ const decrypt = (encryptedText) => {
 const sendMessage = (message, origin) => {
     for (const socket of connections.keys()) {
         if (socket !== origin) {
-            const encryptedMessage = encrypt(message);
+            const encryptedMessage = encrypt(message);           
             socket.write(encryptedMessage)
         }
     }
@@ -77,7 +77,7 @@ server.on('connection', (socket) => {
             console.log(`Conexion ${remotePort} finalizada`)
             socket.end()
 
-        } else {           
+        } else {                   
             const decryptedMessage = decrypt(message);
             const fullMessage = `${connections.get(socket)}: ${decryptedMessage}`
             sendMessage(fullMessage, socket)
