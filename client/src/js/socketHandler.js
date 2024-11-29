@@ -5,11 +5,12 @@ const { encrypt, decrypt } = require('./encryption.js'); // Asegúrate de usar l
 let socket;
 let username = '';
 const portHost = 8000;
+
 /**
  * @description Contenedor de errores del socket
  */
 const SocketErrors = {
-    ECONNREFUSED: () => console.log('El servidor está inaccesible. Reintentando conexión...'),
+    ECONNREFUSED: () => console.log('El servidor está inaccesible. Reintentando conexión...'),
     ECONNRESET: () => console.log('El servidor cerró la conexión inesperadamente. Reintentando...'),
     ETIMEDOUT: () => console.log('La conexión al servidor tardó demasiado. Reintentando...'),
 };
@@ -21,12 +22,13 @@ const SocketErrorDefault = () => console.log('Error inesperado del socket');
  * @param {Function} onMessageReceived - Callback para manejar mensajes del servidor
  */
 const setupSocketEvents = (socket, onMessageReceived) => {
-    
+
     socket.on('ready', () => console.log('Socket listo para enviar y recibir datos.'));
-    
+
     socket.on('end', () => console.log('Servidor solicitó cierre de conexión.'));
 
     socket.on('timeout', () => console.warn('El socket ha entrado en tiempo de espera (timeout).'));
+
 
     // Evento 'data' recibe un mensaje del servidor
     socket.on('data', (data) => {
@@ -68,6 +70,7 @@ const connectToServer = (onMessageReceived) => {
         setupSocketEvents(socket, onMessageReceived);
     } catch (error) {
         console.error('Error al conectar al servidor:', error);
+        
     }
 };
 

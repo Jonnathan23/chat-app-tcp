@@ -1,5 +1,7 @@
 const form = document.getElementById('myForm');
 const listMessages = document.getElementById('listMessages');
+const classOther = 'other-message';
+const classMy = 'my-message';
 
 // Enviar mensajes al servidor
 const handleSubmit = (e) => {
@@ -7,23 +9,28 @@ const handleSubmit = (e) => {
     const message = e.target.message.value;
 
     if (message) {
-        window.electron.sendMessage(message); // Usar la función del preload
-        addMessageToList(`Tú: ${message}`);
+        window.electron.sendMessage(message);
+        addMessageToList(`Tú: ${message}`, classMy);
     }
 
     e.target.message.value = '';
 };
 
-// Mostrar mensajes en la lista
-const addMessageToList = (message) => {
+/**
+ * @description Añade mensajes a la lista
+ * @param {*} message 
+ * @param {*} classStyle 
+ */
+const addMessageToList = (message, classStyle) => {
     const li = document.createElement('li');
+    li.classList.add(classStyle);
     li.textContent = message;
     listMessages.appendChild(li);
 };
 
 // Escuchar mensajes del servidor
 window.electron.onMessage((message) => {
-    addMessageToList(`${message}`);
+    addMessageToList(`${message}`, classOther);
 });
 
 // Manejar el evento del formulario

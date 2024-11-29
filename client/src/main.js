@@ -36,4 +36,6 @@ app.whenReady().then(() => {
 
     // Configurar el nombre de usuario
     ipcMain.on('set-username', (_, user) => setUsername(user));
+
+    
 })
