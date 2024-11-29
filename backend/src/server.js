@@ -13,6 +13,11 @@ const connections = new Map()
  * @param {*} origin  --> Socket origen
  */
 const sendMessage = (message, origin) => {
+  for(const socket of connections.keys()) {
+    if (socket !== origin) {
+      socket.write(message)
+    }
+  }
 
 }
 
@@ -32,14 +37,14 @@ server.on('connection', (socket) => {
       socket.end()
 
     } else {
-      console.log(`Mensaje recibido: ${message}`);
-      socket.write(`${remotePort} --> ${message}`)
 
+      for(const username of connections.values()) {
+        console.log(username)
+      }
+
+      const fullMessage = `${connections.get(socket)}: ${message}`      
+      sendMessage(fullMessage, socket)
     }
-
-
-
-
   })
 
   socket.on('close', () => {

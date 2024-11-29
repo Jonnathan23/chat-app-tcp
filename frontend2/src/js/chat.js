@@ -8,7 +8,7 @@ const handleSubmit = (e) => {
 
     if (message) {
         window.electron.sendMessage(message); // Usar la función del preload
-        //addMessageToList(`Tú: ${message}`);
+        addMessageToList(`Tú: ${message}`);
     }
 
     e.target.message.value = '';
