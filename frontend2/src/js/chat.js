@@ -7,8 +7,8 @@ const handleSubmit = (e) => {
     const message = e.target.message.value;
 
     if (message) {
-        window.electron.sendMessage(message); // Usar la función del preload
-        addMessageToList(`Tú: ${message}`);
+        window.electron.sendMessage(message);
+        addMyMessageToList(`Tú: ${message}`);
     }
 
     e.target.message.value = '';
@@ -17,9 +17,18 @@ const handleSubmit = (e) => {
 // Mostrar mensajes en la lista
 const addMessageToList = (message) => {
     const li = document.createElement('li');
+    li.classList.add('other-message');
     li.textContent = message;
     listMessages.appendChild(li);
 };
+
+const addMyMessageToList = (message) => {
+    const li = document.createElement('li');
+    li.classList.add('my-message');
+    li.textContent = message;
+    listMessages.appendChild(li);
+}
+
 
 // Escuchar mensajes del servidor
 window.electron.onMessage((message) => {

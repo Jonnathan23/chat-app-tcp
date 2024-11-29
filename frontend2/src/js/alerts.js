@@ -1,21 +1,20 @@
 const Swal = require('sweetalert2');
 
-const successAlert = (message) => {
-    Swal.fire({
-        icon: 'success',
-        title: 'Proceso exitoso',
-        text: message,        
-        timer: 2500
-        
-    })
-}
-
-const errorAlert = (message) => {
+// Mostrar una alerta de error
+const errorServerAlert = (message) => {
     Swal.fire({
         icon: 'error',
-        title: 'Proceso fallido',
-        text: message,        
-        timer: 2500
-        
-    })
-}
+        title: 'Problema con el servidor',
+        text: message,
+        showCloseButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+    });
+};
+
+// Cerrar la alerta
+const closeAlert = () => {
+    Swal.close();
+};
+
+module.exports = { errorServerAlert, closeAlert };

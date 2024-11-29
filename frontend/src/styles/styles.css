@@ -285,9 +285,26 @@ header {
     color: var(--color_font);
 }
 
-.cont--text>li:nth-child(odd) {
+.cont--text .my-message {
     background-color: rgba(81, 73, 255, .3);
+    border-radius: 1rem 1rem 0rem 1rem;
+    width: 80%;
+    margin-left: auto;
+    margin-bottom: 0.5rem;
+    text-align: right;
 }
+.cont--text .other-message {
+    background-color:rgb(141, 142, 161) ;
+    border-radius: 1rem 1rem 1rem 0;
+    width: 80%;
+    margin-right: auto;
+    margin-bottom: 0.5rem;
+    text-align: left;
+
+    color: #FFFF;
+}
+
+
 
 .messages--title {
     width: 100%;
