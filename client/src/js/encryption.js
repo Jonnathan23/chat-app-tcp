@@ -1,15 +1,15 @@
 const crypto = require('crypto');
 
 
-// Clave secreta y algoritmo de encriptación (debe coincidir con el servidor)
-const SECRET_KEY = '12345678901234567890123456789012'; // 32 caracteres
+/** @description Clave secreta y algoritmo de encriptación (debe coincidir con el servidor) - 32 caracteres */
+const SECRET_KEY = '12345678901234567890123456789012';
 const ALGORITHM = 'aes-256-ctr';
 
 
 /**
  * @description Encriptar un mensaje
  * @param {*} text 
- * @returns 
+ * @returns void
  */
 const encrypt = (text) => {
     const iv = crypto.randomBytes(16); // Vector de inicialización
@@ -22,7 +22,7 @@ const encrypt = (text) => {
 /**
  * @description Desencriptar un mensaje
  * @param {*} encryptedText 
- * @returns 
+ * @returns void
  */
 const decrypt = (encryptedText) => {
     const [iv, content] = encryptedText.split(':');
